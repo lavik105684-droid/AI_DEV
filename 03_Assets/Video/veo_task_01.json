@@ -1,0 +1,9 @@
+{
+  "task": "Veo Video Generation",
+  "prompt": "An animated charcoal sketch style animation. A close-up of a cup of coffee on a desk, a hand comes in to pick it up. Very smooth dynamics of the steam rising from the coffee. In the background, a blurry computer screen with lines of code or data analysis charts. The mood is calm, reflective, and slightly nostalgic. Subdued colors, sketchy lines.",
+  "parameters": {
+    "style": "lo-fi",
+    "fps": 24,
+    "aesthetic": "sketch"
+  }
+}
