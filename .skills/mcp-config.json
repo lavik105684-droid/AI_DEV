@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "node",
+      "args": ["path/to/filesystem/server.js"],
+      "disabled": false
+    },
+    "memory": {
+      "command": "node",
+      "args": ["path/to/memory/server.js"],
+      "disabled": false
+    }
+  }
+}
