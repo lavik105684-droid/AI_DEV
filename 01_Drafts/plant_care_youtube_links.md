@@ -25,6 +25,11 @@
 16. [Подкормка алоказии для быстрого роста](https://www.youtube.com/watch?v=ZfXjG9N_L08) - Схемы внесения удобрений для стимуляции вегетации. **Теги:** подкормка, удобрения.
 17. [Алоказия Полли: уход в деталях](https://www.youtube.com/watch?v=mQ9DkY4W_8A) - Особенности сорта Полли: свет, температура, влажность. **Теги:** уход, освещение.
 18. [Секреты цветения алоказии](https://www.youtube.com/watch?v=LqUu_Y6Ff-c) - Как добиться цветения и стоит ли его сохранять. **Теги:** цветение, уход.
+19. [Alocasia Frydek - 12 months of successful growth](https://www.youtube.com/watch?v=QiRHN8DTp74) - 12-месячный опыт выращивания Frydek на семи-гидропонике. **Теги:** семи-гидропоника, уход.
+20. [2 BEST Ways to Propagate Alocasia Plant](https://www.youtube.com/watch?v=DzjcJucpvRI) - Пошаговое руководство по двум лучшим способам размножения алоказии. **Теги:** размножение, пошагово.
+21. [In-Depth Alocasia Plant Care Guide](https://www.youtube.com/watch?v=u23kd1qo0tE) - Глубокий гид по поливу, составу почвы и освещению. **Теги:** почва, свет, полив.
+22. [Alocasia Plant Care Guide 🌱 Elephant Ear](https://www.youtube.com/watch?v=dNfjoxx8Cs8) - Баланс света и влаги для предотвращения сброса листьев. **Теги:** свет, влага.
+23. [Alocasia Plant Care 101](https://www.youtube.com/watch?v=7X0XA4qlLY4) - Всё от полива и пересадки до борьбы с вредителями и периода покоя. **Теги:** уход, вредители, покой.
 
 ## 2. Лимон (Lemon)
 *Важные аспекты: плодоношение, зимнее содержание, борьба с вредителями.*
