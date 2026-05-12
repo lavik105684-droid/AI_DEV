@@ -1,0 +1,17 @@
+TASK: Create a storyboard for the following memoir.
+SCENES: exactly 5 scenes.
+OUTPUT: JSON ONLY.
+STRUCTURE: 
+{
+  "storyboard_name": "...",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "visual_description": "...",
+      "narration_text": "...",
+      "duration": 5
+    }
+  ]
+}
+STYLE: Moscow 2011-2012, nostalgia, authentic atmosphere.
+MEMOIR TEXT: 
