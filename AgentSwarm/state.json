@@ -1,0 +1,49 @@
+{
+  "agents": {
+    "Manager": {
+      "status": "Working",
+      "last_active": "12:37:13"
+    },
+    "QA": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "Dev": {
+      "status": "Working",
+      "last_active": "12:37:13"
+    },
+    "Design": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "Video-maker": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "SEO": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "Analyst": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "Archivarius": {
+      "status": "Working",
+      "last_active": "12:37:48"
+    }
+  },
+  "logs": [
+    "[12:37:48] Archivarius: Verifying_historical_context",
+    "[12:37:13] Dev: Local_Brain_Active",
+    "[12:37:13] Manager: Full_Production_Started",
+    "[12:36:42] Manager: Full_Production_Started",
+    "[12:35:00] Manager: Full_Production_Started",
+    "[12:34:37] Manager: Project_Status:_Full_Production_Started",
+    "[12:34:14] Manager: Project_Status:_Full_Production_Started",
+    "[12:33:26] Manager: Project_Status:_Full_Production_Started",
+    "[12:33:04] Dev: Running_on_Local_Brain_(Ollama)",
+    "[12:32:21] Manager: Project_Status:_Full_Production_Started",
+    "[12:32:09] Manager: TestFromScript"
+  ]
+}

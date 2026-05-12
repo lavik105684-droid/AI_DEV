@@ -30,8 +30,8 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./n8n_data:/home/node/.n8n
-      - ./Memoirs:/obsidian_memoirs
-      - ./Scripts:/scripts
+      - ./Memoirs:/home/node/.n8n-files/Memoirs
+      - ./Scripts:/home/node/.n8n-files/Scripts
     restart: always
 
 volumes:
