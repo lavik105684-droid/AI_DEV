@@ -34,6 +34,7 @@ services:
       - ./Memoirs:/home/node/.n8n-files/Memoirs
       - ./Scripts:/home/node/.n8n-files/Scripts
       - ./Prompts:/home/node/.n8n-files/Prompts
+      - ./:/data
     restart: always
 
 volumes:

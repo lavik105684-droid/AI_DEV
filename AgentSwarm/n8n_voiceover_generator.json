@@ -13,7 +13,10 @@
       "name": "Trigger: Approved Script",
       "type": "n8n-nodes-base.localFileTrigger",
       "typeVersion": 1,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ]
     },
     {
       "parameters": {
@@ -28,7 +31,10 @@
       "name": "Generate Voiceover",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [250, 0]
+      "position": [
+        250,
+        0
+      ]
     },
     {
       "parameters": {
@@ -39,7 +45,10 @@
       "name": "Wait for Audio",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [500, 0]
+      "position": [
+        500,
+        0
+      ]
     },
     {
       "parameters": {
@@ -54,7 +63,23 @@
       "name": "Trigger Video Render",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [750, 0]
+      "position": [
+        750,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "bash /data/sync_swarm.sh"
+      },
+      "id": "5",
+      "name": "Sync Swarm",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        0
+      ]
     }
   ],
   "connections": {
@@ -90,6 +115,18 @@
           }
         ]
       ]
+    },
+    "Trigger Video Render": {
+      "main": [
+        [
+          {
+            "node": "Sync Swarm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
-  }
+  },
+  "id": "LYTjW458N9UY2Vnp"
 }
