@@ -14,5 +14,24 @@ services:
       - open-webui-data:/app/backend/data
     restart: always
 
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=Europe/Moscow
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+      - ./Memoirs:/obsidian_memoirs
+    restart: always
+
 volumes:
   open-webui-data:

@@ -1,0 +1,174 @@
+{
+  "name": "Memoirs Summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "e30e69af-a5b7-4db4-ab6a-60ea8724d1a5",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "path": "/obsidian_memoirs"
+      },
+      "id": "a929bdca-9759-4f76-ae0e-749e4d4177b9",
+      "name": "List Files",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.name }}"
+      },
+      "id": "189ec662-7935-4346-ab50-9ce8383eef53",
+      "name": "Read File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8501/?agent=Analyst&status=Thinking...&message=Читаю%20новые%20заметки",
+        "options": {}
+      },
+      "id": "6d3c0ba1-b687-4d9f-aab7-dc26d36ea1f8",
+      "name": "Update Status: Thinking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "qwen2.5-coder:14b"
+            },
+            {
+              "name": "prompt",
+              "value": "Сделай краткое резюме этого текста: {{ $('Read File').item.json.data }}"
+            },
+            {
+              "name": "stream",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d0dc0870-13f5-4dc7-baab-2b99203ca073",
+      "name": "Ask Ollama (Qwen2.5-coder)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8501/?agent=Analyst&status=Completed&message=Резюме%20готово",
+        "options": {}
+      },
+      "id": "90d1656f-2ce9-408a-b8b8-4c91bbff1eb6",
+      "name": "Update Status: Completed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1200,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "List Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files": {
+      "main": [
+        [
+          {
+            "node": "Read File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read File": {
+      "main": [
+        [
+          {
+            "node": "Update Status: Thinking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status: Thinking": {
+      "main": [
+        [
+          {
+            "node": "Ask Ollama (Qwen2.5-coder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Ollama (Qwen2.5-coder)": {
+      "main": [
+        [
+          {
+            "node": "Update Status: Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "df1db2c0-1cba-4e94-b771-8898abfb9e9f"
+}
