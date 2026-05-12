@@ -27,6 +27,7 @@ services:
       - WEBHOOK_URL=http://localhost:5678/
       - GENERIC_TIMEZONE=Europe/Moscow
       - N8N_BLOCK_NODES=
+      - N8N_BLOCK_EXTERNAL_COMMANDS=false
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
