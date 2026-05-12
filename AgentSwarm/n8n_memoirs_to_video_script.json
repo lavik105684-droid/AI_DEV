@@ -1,0 +1,173 @@
+{
+  "name": "Memoirs-to-Video-Script",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerOn": "fileCreated",
+        "path": "/obsidian_memoirs",
+        "events": [
+          "add"
+        ],
+        "options": {
+          "ignored": [
+            "*.tmp",
+            "~*"
+          ]
+        }
+      },
+      "id": "trigger-id",
+      "name": "Local File Trigger",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "={{ $json.path }}"
+      },
+      "id": "read-file",
+      "name": "Read File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=\"http://host.docker.internal:8501/?agent=Design&status=Scripting...&message=Генерирую%20сценарий%20для%20\" + encodeURIComponent($('Local File Trigger').item.json.name)",
+        "options": {}
+      },
+      "id": "update-dashboard-1",
+      "name": "Status: Scripting",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=AIzaSyCBlRsE5nUpP33_4wbot_SIr_N7wd_HqS0",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contents",
+              "value": "={{ [ { \"parts\": [ { \"text\": \"Ты опытный сценарист. На основе предоставленного текста сгенерируй JSON-объект со сценарием на 5 сцен для видеоролика. Выведи строго валидный JSON без маркдаун-блоков. Текст: \" + $('Read File').item.json.data } ] } ] }}"
+            },
+            {
+              "name": "generationConfig",
+              "value": "={{ { \"responseMimeType\": \"application/json\" } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "gemini-api",
+      "name": "Gemini 1.5 Pro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "={{ 'echo \\'' + $json.candidates[0].content.parts[0].text.replace(/'/g, '\\\\'\\'') + '\\' > /scripts/' + $('Local File Trigger').item.json.name.replace('.md', '') + '_script.json' }}"
+      },
+      "id": "save-file",
+      "name": "Save JSON Script",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=\"http://host.docker.internal:8501/?agent=Design&status=Completed&message=Сценарий%20сохранен%20в%20Scripts/\" + encodeURIComponent($('Local File Trigger').item.json.name.replace('.md', '')) + \"_script.json\"",
+        "options": {}
+      },
+      "id": "update-dashboard-2",
+      "name": "Status: Completed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1200,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Local File Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read File": {
+      "main": [
+        [
+          {
+            "node": "Status: Scripting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status: Scripting": {
+      "main": [
+        [
+          {
+            "node": "Gemini 1.5 Pro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 1.5 Pro": {
+      "main": [
+        [
+          {
+            "node": "Save JSON Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save JSON Script": {
+      "main": [
+        [
+          {
+            "node": "Status: Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "gemini-workflow-v1"
+}

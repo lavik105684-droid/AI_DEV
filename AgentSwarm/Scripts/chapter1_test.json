@@ -1,0 +1,16 @@
+{
+  "scenes": [
+    {
+      "scene_number": 1,
+      "visual_description": "A dusty engineer's desk in Moscow, 2011.",
+      "narration_text": "Москва, 2011 год. Пыльный стол инженера завален чертежами.",
+      "on_screen_text": "2011"
+    },
+    {
+      "scene_number": 2,
+      "visual_description": "The engineer looking out the window at the rain.",
+      "narration_text": "За окном идет дождь, а в голове только мысли о предстоящем проекте.",
+      "on_screen_text": "Страх и риск"
+    }
+  ]
+}

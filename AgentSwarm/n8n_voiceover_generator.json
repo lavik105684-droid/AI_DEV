@@ -1,0 +1,132 @@
+{
+  "name": "06_Voiceover_Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "/home/node/.n8n-files/Scripts",
+        "options": {
+          "append": false,
+          "ignoreHidden": true
+        }
+      },
+      "id": "1",
+      "name": "Trigger: Approved Script",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8002/voiceover",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"json_path\": \"{{ $json.path }}\" }",
+        "options": {}
+      },
+      "id": "2",
+      "name": "Generate Voiceover",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "id": "3",
+      "name": "Wait for Audio",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8002/render",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"json_path\": \"{{ $node[\"Trigger: Approved Script\"].json[\"path\"] }}\" }",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Trigger Video Render",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        750,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "bash /data/sync_swarm.sh"
+      },
+      "id": "5",
+      "name": "Sync Swarm",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Trigger: Approved Script": {
+      "main": [
+        [
+          {
+            "node": "Generate Voiceover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Voiceover": {
+      "main": [
+        [
+          {
+            "node": "Wait for Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Audio": {
+      "main": [
+        [
+          {
+            "node": "Trigger Video Render",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Video Render": {
+      "main": [
+        [
+          {
+            "node": "Sync Swarm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "id": "LYTjW458N9UY2Vnp"
+}

@@ -1,0 +1,9 @@
+{
+  "scenes": [
+    {"text": "Intro Scene"},
+    {"text": "Main Point 1"},
+    {"text": "Main Point 2"},
+    {"text": "Conclusion"},
+    {"text": "Outro"}
+  ]
+}

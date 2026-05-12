@@ -1,0 +1,208 @@
+{
+  "name": "04_Memoirs_Full_Production_v3",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 20
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "path": "/obsidian_memoirs",
+        "options": {
+          "ignoreHidden": true
+        }
+      },
+      "id": "2",
+      "name": "List Memoirs",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.name }}",
+              "operation": "endsWith",
+              "value2": ".md"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Is Markdown?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "qwen2.5-coder:14b"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ 'Generate a 5-scene storyboard JSON for this memoir. Each scene MUST have narration_text and visual_description. \\n\\nMemoir: ' + $node[\"Read Memoir\"].json[\"data\"] }}"
+            },
+            {
+              "name": "stream",
+              "value": false
+            },
+            {
+              "name": "format",
+              "value": "json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4",
+      "name": "Creative Node (Qwen)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "={{ $json.path }}"
+      },
+      "id": "5",
+      "name": "Read Memoir",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "={{ 'echo \\'' + $node[\"Creative Node (Qwen)\"].json[\"response\"] + '\\' > /scripts/' + $node[\"List Memoirs\"].json[\"name\"].replace('.md', '') + '_script.json' }}"
+      },
+      "id": "6",
+      "name": "Save Script",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "bash /data/sync_swarm.sh"
+      },
+      "id": "7",
+      "name": "Sync Swarm",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "List Memoirs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Memoirs": {
+      "main": [
+        [
+          {
+            "node": "Is Markdown?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Markdown?": {
+      "main": [
+        [
+          {
+            "node": "Read Memoir",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Memoir": {
+      "main": [
+        [
+          {
+            "node": "Creative Node (Qwen)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creative Node (Qwen)": {
+      "main": [
+        [
+          {
+            "node": "Save Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Script": {
+      "main": [
+        [
+          {
+            "node": "Sync Swarm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "id": "I1GZvDOhd2v9ERe3"
+}

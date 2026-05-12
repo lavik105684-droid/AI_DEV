@@ -1,0 +1,2 @@
+{"__type":"$$EventMessageAudit","id":"521059ce-4800-4fa7-80b7-1d1d707e9f15","ts":"2026-05-12T12:31:34.275+00:00","eventName":"n8n.audit.user.login.success","message":"n8n.audit.user.login.success","payload":{"userId":"9664abf5-3b16-4a54-af10-667b06c8366b","_email":"lavik105684@gmail.com","_firstName":"Sergei","_lastName":"Lavrukhin","globalRole":"global:owner","authenticationMethod":"email"}}
+{"__type":"$$EventMessageConfirm","confirm":"521059ce-4800-4fa7-80b7-1d1d707e9f15","ts":"2026-05-12T12:31:34.275+00:00","source":{"id":"0","name":"eventBus"}}

@@ -1,0 +1,17 @@
+Act as a creative storyboard generator for a memoir-to-video pipeline.
+Atmosphere: Moscow 2011-2012, engineer's perspective, slightly nostalgic, technical but emotional.
+
+INPUT TEXT:
+{{ memoir_text }}
+
+{{ rejection_context }}
+
+TASK:
+Generate a JSON storyboard with 5 scenes.
+Each scene must have:
+- "scene_number"
+- "visual_description": Detailed prompt for image generation.
+- "narration_text": Text to be spoken.
+- "on_screen_text": Keywords for the screen.
+
+JSON ONLY. NO CHAT.

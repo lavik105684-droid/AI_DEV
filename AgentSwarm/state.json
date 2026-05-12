@@ -1,0 +1,52 @@
+{
+  "agents": {
+    "Manager": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "QA": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "Dev": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "Design": {
+      "status": "Idle",
+      "last_active": "13:24:38"
+    },
+    "Video-maker": {
+      "status": "Audio:_Synced",
+      "last_active": "13:24:54"
+    },
+    "SEO": {
+      "status": "Idle",
+      "last_active": "N/A"
+    },
+    "Analyst": {
+      "status": "Idle",
+      "last_active": "13:25:18"
+    },
+    "Archivarius": {
+      "status": "Idle",
+      "last_active": "N/A"
+    }
+  },
+  "cloud_calls": 0,
+  "qa_stats": {
+    "pass": 0,
+    "fail": 0
+  },
+  "system_report": {
+    "efficiency": "0.0%",
+    "saved_calls": 0,
+    "last_report": "2026-05-12T13:16:53.511206"
+  },
+  "logs": [
+    "[13:25:18] Analyst: Render_Time:_24.15_sec_VRAM:_VRAM_Tracking_Not_Available",
+    "[13:24:54] Video-maker: Assembling_chapter1_test",
+    "[13:24:38] Design: Voiceover_Generated",
+    "[13:24:38] Design: Generating_for_chapter1_test"
+  ]
+}
