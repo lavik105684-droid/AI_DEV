@@ -1,0 +1,316 @@
+{
+  "name": "04_Memoirs_Full_Production_Headless",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 20
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "path": "/home/node/.n8n-files/Memoirs",
+        "options": {
+          "ignoreHidden": true
+        }
+      },
+      "id": "2",
+      "name": "List Memoirs",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [200, 0]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "/home/node/.n8n-files/Prompts/creative_v1.txt"
+      },
+      "id": "3",
+      "name": "Read Creative Prompt",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [400, -100]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "/home/node/.n8n-files/Prompts/archivist_v1.txt"
+      },
+      "id": "4",
+      "name": "Read Archivist Prompt",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [400, 100]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "={{ $node[\"List Memoirs\"].json.path }}"
+      },
+      "id": "5",
+      "name": "Read Memoir",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [600, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "qwen2.5-coder:14b"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $node[\"Read Creative Prompt\"].json.data + \"\\n\\n\" + $node[\"Read Memoir\"].json.data }}"
+            },
+            {
+              "name": "stream",
+              "value": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6",
+      "name": "Creative Node (Qwen)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [800, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "qwen2.5:7b"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $node[\"Read Archivist Prompt\"].json.data + \"\\n\\n\" + $node[\"Creative Node (Qwen)\"].json.response }}"
+            },
+            {
+              "name": "stream",
+              "value": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7",
+      "name": "Archivarius (QA)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1000, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.response }}",
+              "operation": "contains",
+              "value2": "PASS"
+            }
+          ]
+        }
+      },
+      "id": "8",
+      "name": "Is Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1200, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8002/render",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "json_content",
+              "value": "={{ $node[\"Creative Node (Qwen)\"].json.response }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9",
+      "name": "Trigger Render",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1400, -100]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8501/success",
+        "options": {}
+      },
+      "id": "10",
+      "name": "Record Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1600, -100]
+    },
+    {
+      "parameters": {
+        "command": "bash /data/sync_swarm.sh"
+      },
+      "id": "11",
+      "name": "Sync Swarm",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1800, 0]
+    },
+    {
+      "parameters": {
+        "command": "={{ 'echo \"# JULES CONSULT REPORT\\n\\n## Original Text\\n' + $node[\"Read Memoir\"].json.data + '\\n\\n## Failed JSON\\n' + $node[\"Creative Node (Qwen)\"].json.response + '\\n\\n## Archivist Criticism\\n' + $node[\"Archivarius (QA)\"].json.response + '\" > /data/JULES_CONSULT.md' }}"
+      },
+      "id": "12",
+      "name": "Generate JULES_CONSULT",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1400, 100]
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "List Memoirs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Memoirs": {
+      "main": [
+        [
+          {
+            "node": "Read Creative Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Archivist Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Memoir",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Memoir": {
+      "main": [
+        [
+          {
+            "node": "Creative Node (Qwen)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creative Node (Qwen)": {
+      "main": [
+        [
+          {
+            "node": "Archivarius (QA)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archivarius (QA)": {
+      "main": [
+        [
+          {
+            "node": "Is Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Approved?": {
+      "main": [
+        [
+          {
+            "node": "Trigger Render",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate JULES_CONSULT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Render": {
+      "main": [
+        [
+          {
+            "node": "Record Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Success": {
+      "main": [
+        [
+          {
+            "node": "Sync Swarm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate JULES_CONSULT": {
+      "main": [
+        [
+          {
+            "node": "Sync Swarm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "id": "I1GZvDOhd2v9ERe3"
+}

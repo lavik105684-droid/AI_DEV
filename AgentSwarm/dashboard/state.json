@@ -1,0 +1,10 @@
+{
+  "total_runs": 0,
+  "successful_renders": 0,
+  "efficiency_rate": 0.0,
+  "saved_tokens": 0,
+  "last_success_timestamp": null,
+  "active_agent": "Idle",
+  "status_message": "System Ready",
+  "session_start": "2026-05-12T17:27:20+03:00"
+}

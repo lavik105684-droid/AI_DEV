@@ -68,20 +68,39 @@ async def increment_cloud():
     save_state(state)
     return {"status": "success", "total_cloud_calls": state["cloud_calls"]}
 
+@app.get("/success")
+async def record_success():
+    state = load_state()
+    state["successful_renders"] = state.get("successful_renders", 0) + 1
+    state["last_success_timestamp"] = datetime.now().isoformat()
+    # Update efficiency
+    stats = state.get("qa_stats", {"pass": 0, "fail": 0})
+    total = stats["pass"] + stats["fail"]
+    if total > 0:
+        state["efficiency_rate"] = round((state["successful_renders"] / total) * 100, 2)
+    save_state(state)
+    return {"status": "success"}
+
+@app.get("/add_tokens")
+async def add_tokens(count: int = Query(...)):
+    state = load_state()
+    state["saved_tokens"] = state.get("saved_tokens", 0) + count
+    save_state(state)
+    return {"status": "success", "total_saved_tokens": state["saved_tokens"]}
+
 @app.get("/generate_report")
 async def generate_report():
     state = load_state()
     stats = state.get("qa_stats", {"pass": 0, "fail": 0})
     total = stats["pass"] + stats["fail"]
-    efficiency = 0.0
-    if total > 0:
-        efficiency = (stats["pass"] / total) * 100
+    efficiency = state.get("efficiency_rate", 0.0)
     
-    saved = (stats["pass"] * 3) - state.get("cloud_calls", 0)
+    saved = state.get("saved_tokens", 0)
     
     report = {
         "efficiency": f"{efficiency:.1f}%",
-        "saved_calls": saved,
+        "saved_tokens": saved,
+        "last_success": state.get("last_success_timestamp"),
         "last_report": datetime.now().isoformat()
     }
     state["system_report"] = report
