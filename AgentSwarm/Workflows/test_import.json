@@ -1,0 +1,146 @@
+{
+  "updatedAt": "2026-05-12T08:42:53.755Z",
+  "createdAt": "2026-05-12T08:42:53.755Z",
+  "id": "P548EZX7kOeRzoxX",
+  "name": "02_Video_Production",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "0ea0af48-76d2-4ca4-a2e8-414d4fdd313e",
+      "name": "Wait for File (JSON)",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "triggerOn": "folder",
+        "path": "/scripts",
+        "events": [
+          "add"
+        ],
+        "ignoredFiles": "*.mp4,*.jpg,*.png"
+      }
+    },
+    {
+      "id": "8891bef9-62d7-4b2d-aca4-bba89e79566b",
+      "name": "Trigger Render API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8002/render",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"json_path\": \"{{ $json.path }}\" }"
+      }
+    },
+    {
+      "id": "ef22d14a-1191-4e1c-b94a-77516d048cd0",
+      "name": "Dashboard Update (Start)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "http://host.docker.internal:8501/?agent=QA&status=Working&message=Assembling_Video_via_GPU"
+      }
+    },
+    {
+      "parameters": {
+        "command": "bash /data/sync_swarm.sh"
+      },
+      "id": "da415d1a-7ccd-40b0-8e24-5c65b93018a7",
+      "name": "Sync Swarm",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 2,
+      "position": [
+        748,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Wait for File (JSON)": {
+      "main": [
+        [
+          {
+            "node": "Trigger Render API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Render API": {
+      "main": [
+        [
+          {
+            "node": "Dashboard Update (Start)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dashboard Update (Start)": {
+      "main": [
+        [
+          {
+            "node": "Sync Swarm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "pinData": null,
+  "versionId": "c56975a1-d90f-48ba-a552-5e4d1b79eb49",
+  "activeVersionId": null,
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T08:42:53.758Z",
+      "createdAt": "2026-05-12T08:42:53.758Z",
+      "role": "workflow:owner",
+      "workflowId": "P548EZX7kOeRzoxX",
+      "projectId": "wlDTEhCvjchgUXra",
+      "project": {
+        "updatedAt": "2026-05-12T08:20:10.781Z",
+        "createdAt": "2026-05-12T08:11:44.552Z",
+        "id": "wlDTEhCvjchgUXra",
+        "name": "Sergei Lavrukhin <lavik105684@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "9664abf5-3b16-4a54-af10-667b06c8366b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

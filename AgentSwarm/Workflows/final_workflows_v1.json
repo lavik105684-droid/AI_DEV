@@ -1,0 +1,1850 @@
+[
+  {
+    "updatedAt": "2026-05-12T08:42:53.755Z",
+    "createdAt": "2026-05-12T08:42:53.755Z",
+    "id": "P548EZX7kOeRzoxX",
+    "name": "02_Video_Production",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "0ea0af48-76d2-4ca4-a2e8-414d4fdd313e",
+        "name": "Wait for File (JSON)",
+        "type": "n8n-nodes-base.localFileTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {
+          "triggerOn": "folder",
+          "path": "/scripts",
+          "events": [
+            "add"
+          ],
+          "ignoredFiles": "*.mp4,*.jpg,*.png"
+        }
+      },
+      {
+        "id": "8891bef9-62d7-4b2d-aca4-bba89e79566b",
+        "name": "Trigger Render API",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          224,
+          0
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8002/render",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"json_path\": \"{{ $json.path }}\" }"
+        }
+      },
+      {
+        "id": "ef22d14a-1191-4e1c-b94a-77516d048cd0",
+        "name": "Dashboard Update (Start)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          448,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "http://host.docker.internal:8501/?agent=QA&status=Working&message=Assembling_Video_via_GPU"
+        }
+      },
+      {
+        "parameters": {
+          "command": "bash /data/sync_swarm.sh"
+        },
+        "id": "da415d1a-7ccd-40b0-8e24-5c65b93018a7",
+        "name": "Sync Swarm",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          748,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "Wait for File (JSON)": {
+        "main": [
+          [
+            {
+              "node": "Trigger Render API",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trigger Render API": {
+        "main": [
+          [
+            {
+              "node": "Dashboard Update (Start)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dashboard Update (Start)": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "availableInMCP": true
+    },
+    "staticData": null,
+    "meta": {
+      "aiBuilderAssisted": true,
+      "builderVariant": "mcp"
+    },
+    "pinData": null,
+    "versionId": "c56975a1-d90f-48ba-a552-5e4d1b79eb49",
+    "activeVersionId": null,
+    "versionCounter": 2,
+    "triggerCount": 0,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-05-12T08:42:53.758Z",
+        "createdAt": "2026-05-12T08:42:53.758Z",
+        "role": "workflow:owner",
+        "workflowId": "P548EZX7kOeRzoxX",
+        "projectId": "wlDTEhCvjchgUXra",
+        "project": {
+          "updatedAt": "2026-05-12T08:20:10.781Z",
+          "createdAt": "2026-05-12T08:11:44.552Z",
+          "id": "wlDTEhCvjchgUXra",
+          "name": "Sergei Lavrukhin <lavik105684@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "9664abf5-3b16-4a54-af10-667b06c8366b"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  },
+  {
+    "updatedAt": "2026-05-12T09:18:41.653Z",
+    "createdAt": "2026-05-12T09:12:08.685Z",
+    "id": "2PpLMx7DryrNDWCJ",
+    "name": "03_Code_Review_Pipeline",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "32927715-6533-4905-9a3d-49abd065a384",
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          192
+        ]
+      },
+      {
+        "id": "41486544-dc7c-4af1-b302-0bb6f941dcaf",
+        "name": "Initialize",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          224,
+          192
+        ],
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "1",
+                "name": "attempt",
+                "value": 1,
+                "type": "number"
+              },
+              {
+                "id": "2",
+                "name": "prompt",
+                "value": "Write a Python script that calculates the factorial of 5 and prints it.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "c2db93d8-0714-49a8-a30b-357bc863859a",
+        "name": "Current State",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          448,
+          192
+        ],
+        "parameters": {
+          "mode": "append"
+        }
+      },
+      {
+        "id": "f44bfe17-8ec5-4f1d-9956-d2bd4e04e543",
+        "name": "Dev Coding Update",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          672,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "http://host.docker.internal:8501/?agent=Dev&status=Working&message=Coding..."
+        }
+      },
+      {
+        "id": "74a84895-016c-45ed-b26b-4be6ed780740",
+        "name": "Dev (Ollama)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          672,
+          192
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:11434/api/generate",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ { \"model\": \"qwen2.5-coder:14b\", \"prompt\": $(\"Current State\").first().json.prompt, \"stream\": false } }}"
+        }
+      },
+      {
+        "id": "78327915-3919-4a1c-bb88-265de8b3fd7f",
+        "name": "QA Auditing Update",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          896,
+          192
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "http://host.docker.internal:8501/?agent=QA&status=Working&message=Auditing..."
+        }
+      },
+      {
+        "id": "68157a95-935f-4690-8b8c-ec9492070564",
+        "name": "QA (Ollama)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          896,
+          384
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:11434/api/generate",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ { \"model\": \"qwen2.5:7b\", \"prompt\": \"You are a QA auditor. Review the following Python code. If it has errors, reply with 'ERROR: <description>'. If perfectly valid, reply with 'PASS'.\\n\\nCode:\\n\" + $(\"Dev (Ollama)\").first().json.response, \"stream\": false } }}"
+        }
+      },
+      {
+        "id": "4c93d70b-e7f0-495f-976b-697176c4850d",
+        "name": "Check Errors",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1120,
+          384
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": false,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "1",
+                "leftValue": "={{ $json.response }}",
+                "rightValue": "ERROR",
+                "operator": {
+                  "type": "string",
+                  "operation": "contains"
+                }
+              },
+              {
+                "id": "2",
+                "leftValue": "={{ $json.response }}",
+                "rightValue": "FAIL",
+                "operator": {
+                  "type": "string",
+                  "operation": "contains"
+                }
+              }
+            ],
+            "combinator": "or"
+          }
+        }
+      },
+      {
+        "id": "84475a47-b739-45ae-a86f-ad21663ce6aa",
+        "name": "Check Attempt Limit",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1344,
+          288
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "1",
+                "leftValue": "={{ $(\"Current State\").first().json.attempt }}",
+                "rightValue": 3,
+                "operator": {
+                  "type": "number",
+                  "operation": "lesser"
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "e36d690e-8fd0-4c4a-8e26-3437754915df",
+        "name": "Increment Attempt",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1568,
+          368
+        ],
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "1",
+                "name": "attempt",
+                "value": "={{ $(\"Current State\").first().json.attempt + 1 }}",
+                "type": "number"
+              },
+              {
+                "id": "2",
+                "name": "prompt",
+                "value": "={{ \"The previous code had this error: \" + $(\"QA (Ollama)\").first().json.response + \"\\nPlease fix the code and return only the corrected script.\" }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "852f54c2-3813-41bf-8902-11fe69525bcc",
+        "name": "Dashboard Failed Max",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1568,
+          576
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "http://host.docker.internal:8501/?agent=Dev&status=Error&message=Failed_after_3_attempts"
+        }
+      },
+      {
+        "id": "af8cab2a-16a4-4ec2-ba6c-d0c9a8cd822e",
+        "name": "Dashboard Success",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1344,
+          480
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "http://host.docker.internal:8501/?agent=QA&status=Completed&message=Code_Approved"
+        }
+      },
+      {
+        "parameters": {
+          "command": "bash /data/sync_swarm.sh"
+        },
+        "id": "f21e66a3-99b1-4882-893b-07a048915d56",
+        "name": "Sync Swarm",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1868,
+          286.6666666666667
+        ]
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Initialize",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Initialize": {
+        "main": [
+          [
+            {
+              "node": "Current State",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Current State": {
+        "main": [
+          [
+            {
+              "node": "Dev Coding Update",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Dev (Ollama)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dev (Ollama)": {
+        "main": [
+          [
+            {
+              "node": "QA Auditing Update",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "QA (Ollama)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "QA (Ollama)": {
+        "main": [
+          [
+            {
+              "node": "Check Errors",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Errors": {
+        "main": [
+          [
+            {
+              "node": "Check Attempt Limit",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Dashboard Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Attempt Limit": {
+        "main": [
+          [
+            {
+              "node": "Increment Attempt",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Dashboard Failed Max",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Increment Attempt": {
+        "main": [
+          [
+            {
+              "node": "Current State",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Dev Coding Update": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "QA Auditing Update": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dashboard Failed Max": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dashboard Success": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "availableInMCP": true
+    },
+    "staticData": null,
+    "meta": {
+      "aiBuilderAssisted": true,
+      "builderVariant": "mcp"
+    },
+    "pinData": null,
+    "versionId": "3a7c4691-70fe-4460-9e86-bd1045449ae9",
+    "activeVersionId": null,
+    "versionCounter": 6,
+    "triggerCount": 0,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-05-12T09:12:08.687Z",
+        "createdAt": "2026-05-12T09:12:08.687Z",
+        "role": "workflow:owner",
+        "workflowId": "2PpLMx7DryrNDWCJ",
+        "projectId": "wlDTEhCvjchgUXra",
+        "project": {
+          "updatedAt": "2026-05-12T08:20:10.781Z",
+          "createdAt": "2026-05-12T08:11:44.552Z",
+          "id": "wlDTEhCvjchgUXra",
+          "name": "Sergei Lavrukhin <lavik105684@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "9664abf5-3b16-4a54-af10-667b06c8366b"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  },
+  {
+    "updatedAt": "2026-05-12T10:09:34.028Z",
+    "createdAt": "2026-05-12T09:28:13.136Z",
+    "id": "ZBWr6WCp0vRzrTpZ",
+    "name": "Autonomous video production self-healing pipeline",
+    "description": "Master workflow for Chapter 1 production.",
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "56315705-74f8-4c1e-b27b-82cae6e997c9",
+        "name": "Every 20 Mins",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          176
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutes": 20
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "3a693c2a-2d24-45e3-b19e-57bb982fb272",
+        "name": "List Memoirs",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          224,
+          176
+        ],
+        "parameters": {
+          "command": "ls /home/node/.n8n-files/Memoirs/*.txt"
+        }
+      },
+      {
+        "id": "fdaa6b0d-d99d-45ab-a75d-7ca423c7a4f7",
+        "name": "Split Files",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          448,
+          176
+        ],
+        "parameters": {
+          "jsCode": "\n        const files = items[0].json.stdout.trim().split(\"\\n\");\n        return files.map(f => ({ json: { filePath: f } }));\n      "
+        }
+      },
+      {
+        "id": "bfb6fd33-481b-4d15-a500-8d6c306c3fda",
+        "name": "Deduplicate Files",
+        "type": "n8n-nodes-base.removeDuplicates",
+        "typeVersion": 2,
+        "position": [
+          672,
+          176
+        ],
+        "parameters": {
+          "operation": "removeItemsSeenInPreviousExecutions",
+          "fieldsToMatch": {
+            "fieldToMatch": [
+              {
+                "name": "filePath"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "938301d6-4df1-486a-9686-09e92f13278e",
+        "name": "Read Memoir",
+        "type": "n8n-nodes-base.readBinaryFile",
+        "typeVersion": 1,
+        "position": [
+          896,
+          176
+        ],
+        "parameters": {
+          "filePath": "={{ $json.filePath }}",
+          "dataPropertyName": "memoir_file"
+        }
+      },
+      {
+        "id": "f787a3f9-b9dc-4645-b428-d7c164e26723",
+        "name": "Init Loop & Hash Check",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1120,
+          176
+        ],
+        "parameters": {
+          "jsCode": "\n        const binaryData = await this.helpers.getBinaryDataBuffer(0, 'memoir_file');\n        const memoirText = binaryData.toString('utf8');\n        const filePath = items[0].json.filePath;\n        \n        // Hash check for current session to prevent infinite loop on same error if needed\n        // But Deduplicate already handles \"new files\"\n        \n        return [{\n          json: {\n            memoir_text: memoirText,\n            file_path: filePath,\n            retry_count: 0,\n            rejection_reason: null\n          }\n        }];\n      "
+        }
+      },
+      {
+        "id": "175f4a03-9c76-4bc6-b49a-eb7f41775f3e",
+        "name": "Prepare Creative Prompt",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1344,
+          176
+        ],
+        "parameters": {
+          "jsCode": "\n        const memoirText = items[0].json.memoir_text;\n        const retryCount = items[0].json.retry_count || 0;\n        const rejectionReason = items[0].json.rejection_reason || '';\n        \n        // Dry prompt, no politeness\n        let basePrompt = `TASK: Create storyboard for memoir. 5 scenes. OUTPUT: JSON ONLY. \nSTRUCTURE: { \"scenes\": [ { \"title\": \"scene1\", \"description\": \"visual description\", \"text\": \"narrative text\" } ] }. \nTEXT: ` + memoirText;\n        \n        if (retryCount > 0) {\n          basePrompt = `REJECTION: ${rejectionReason}. FIX. \\n` + basePrompt;\n          if (retryCount >= 1) {\n             basePrompt = `STYLE: VHS-aesthetic. \\n` + basePrompt;\n          }\n        }\n        \n        return [{\n          json: {\n            ...items[0].json,\n            ollama_body: {\n              model: \"qwen2.5-coder:14b\",\n              prompt: basePrompt,\n              stream: false\n            }\n          }\n        }];\n      "
+        }
+      },
+      {
+        "id": "17852f2b-f00a-4637-ab1b-3b395c8abcaa",
+        "name": "Use Gemini?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1568,
+          96
+        ],
+        "parameters": {
+          "conditions": {
+            "conditions": [
+              {
+                "leftValue": "={{ $json.retry_count }}",
+                "operator": "number",
+                "operation": "largerEqual",
+                "rightValue": 3
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "50716c28-890e-4dfb-a0cc-88e0223f3eb3",
+        "name": "Increment Cloud Calls",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1792,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "http://host.docker.internal:8501/increment_cloud"
+        }
+      },
+      {
+        "id": "cb8258b6-b321-4476-bb1c-045f5f897c5f",
+        "name": "Gemini Flash (Backup)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2016,
+          0
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCBlRsE5nUpP33_4wbot_SIr_N7wd_HqS0",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": {{ JSON.stringify($json.ollama_body.prompt) }} }] }] }"
+        }
+      },
+      {
+        "id": "9265a4ef-b5ba-4595-a3c7-6db472814be0",
+        "name": "Parse Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2240,
+          96
+        ],
+        "parameters": {
+          "jsCode": "\n        let responseText = '';\n        if (items[0].json.candidates) {\n          responseText = items[0].json.candidates[0].content.parts[0].text;\n        } else if (items[0].json.response) {\n          responseText = items[0].json.response;\n        }\n        return [{ json: { ...items[0].json, response_text: responseText } }];\n      "
+        }
+      },
+      {
+        "id": "5d638c7c-dcb7-474c-8d96-697a313f154f",
+        "name": "Clean and Prepare QA",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2464,
+          96
+        ],
+        "parameters": {
+          "jsCode": "\n        let response = items[0].json.response_text;\n        response = response.replace(/\\`\\`\\`json/g, \"\").replace(/\\`\\`\\`/g, \"\").trim();\n        const prompt = `QA Moscow 2011-2012. NO modern tech. PASS or ERROR: <reason>.\\n\\nStoryboard: ` + response;\n        \n        const binaryBuffer = Buffer.from(response, 'utf8');\n        \n        return [{\n          json: {\n            ...items[0].json,\n            clean_storyboard_text: response,\n            qa_body: {\n              model: \"qwen2.5-coder:7b\",\n              prompt: prompt,\n              stream: false\n            }\n          },\n          binary: {\n            clean_storyboard: {\n              data: binaryBuffer.toString('base64'),\n              mimeType: 'application/json',\n              fileName: 'storyboard.json'\n            }\n          }\n        }];\n      "
+        }
+      },
+      {
+        "id": "4c3293b6-58ab-4284-a707-9de6b8baf399",
+        "name": "Creative Node (Qwen)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2016,
+          192
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:11434/api/generate",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json.ollama_body) }}"
+        }
+      },
+      {
+        "id": "96580ee4-322d-4fd9-a53c-b92698048a9d",
+        "name": "Archivarius (QA)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2688,
+          96
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:11434/api/generate",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json.qa_body) }}"
+        }
+      },
+      {
+        "id": "dc76f243-506d-46de-93dd-77e965457615",
+        "name": "Script Approved?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2912,
+          96
+        ],
+        "parameters": {
+          "conditions": {
+            "conditions": [
+              {
+                "leftValue": "={{ $json.response }}",
+                "operator": "string",
+                "operation": "contains",
+                "rightValue": "PASS"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "16e83932-21cd-4fae-8822-8739cd900908",
+        "name": "Save Storyboard JSON",
+        "type": "n8n-nodes-base.writeBinaryFile",
+        "typeVersion": 1,
+        "position": [
+          3136,
+          0
+        ],
+        "parameters": {
+          "fileName": "=/home/node/.n8n-files/Scripts/{{ $json.file_path.split(\"/\").pop() }}_storyboard.json",
+          "dataPropertyName": "clean_storyboard"
+        }
+      },
+      {
+        "id": "13f5e13b-a8eb-4f91-ba95-66ec1f29e9eb",
+        "name": "Trigger Video Assembly",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          3360,
+          0
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8002/render",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{ \"json_path\": \"/home/node/.n8n-files/Scripts/{{ $json.file_path.split(\\\"/\\\").pop() }}_storyboard.json\" }"
+        }
+      },
+      {
+        "id": "ec4bbead-4f9f-4646-988b-80a5d16000ca",
+        "name": "Format Rejection",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3136,
+          192
+        ],
+        "parameters": {
+          "jsCode": "\n        let reason = items[0].json.response.replace(/PASS/g, \"\").trim();\n        return [{\n          json: {\n            ...items[0].json,\n            rejection_reason: reason\n          }\n        }];\n      "
+        }
+      },
+      {
+        "id": "ce5e4484-9216-4c29-9245-5ec271ef7013",
+        "name": "Increment Retry Counter",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3360,
+          192
+        ],
+        "parameters": {
+          "jsCode": "\n        return [{\n          json: {\n            ...items[0].json,\n            retry_count: (items[0].json.retry_count || 0) + 1\n          }\n        }];\n      "
+        }
+      },
+      {
+        "id": "7dfcc35f-8086-415e-8262-70de35f57711",
+        "name": "Retry Limit Reached?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          3584,
+          272
+        ],
+        "parameters": {
+          "conditions": {
+            "conditions": [
+              {
+                "leftValue": "={{ $json.retry_count }}",
+                "operator": "number",
+                "operation": "largerEqual",
+                "rightValue": 4
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "7e0efc9c-e548-4824-a35f-ffa23b577e8e",
+        "name": "Dashboard: Critical Error",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          3808,
+          272
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "http://host.docker.internal:8501/?agent=Manager&status=Error&message=CRITICAL:_Retry_Limit_Exceeded"
+        }
+      },
+      {
+        "parameters": {
+          "command": "bash /data/sync_swarm.sh"
+        },
+        "id": "05323a02-bedc-4d3e-84f4-ccd4dcc3c604",
+        "name": "Sync Swarm",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          4108,
+          134.85714285714286
+        ]
+      },
+      {
+        "id": "jules-consult-master",
+        "name": "Generate JULES_CONSULT",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          4000,
+          272
+        ],
+        "parameters": {
+          "command": "cat <<EOF > /data/JULES_CONSULT.md\n# JULES CONSULT REPORT\n## Source Text\n{{ $node[\"Read Memoir\"].json.memoir_text }}\n\n## Failed JSON\n{{ $node[\"Clean and Prepare QA\"].json.clean_storyboard_text }}\n\n## Archivist Critique\n{{ $node[\"Archivarius (QA)\"].json.response }}\n\n## Rejection Reason\n{{ $node[\"Format Rejection\"].json.rejection_reason }}\nEOF"
+        }
+      }
+    ],
+    "connections": {
+      "Every 20 Mins": {
+        "main": [
+          [
+            {
+              "node": "List Memoirs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "List Memoirs": {
+        "main": [
+          [
+            {
+              "node": "Split Files",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Files": {
+        "main": [
+          [
+            {
+              "node": "Deduplicate Files",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Deduplicate Files": {
+        "main": [
+          [
+            {
+              "node": "Read Memoir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Memoir": {
+        "main": [
+          [
+            {
+              "node": "Init Loop & Hash Check",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Init Loop & Hash Check": {
+        "main": [
+          [
+            {
+              "node": "Prepare Creative Prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Creative Prompt": {
+        "main": [
+          [
+            {
+              "node": "Use Gemini?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Use Gemini?": {
+        "main": [
+          [
+            {
+              "node": "Increment Cloud Calls",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Creative Node (Qwen)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Increment Cloud Calls": {
+        "main": [
+          [
+            {
+              "node": "Gemini Flash (Backup)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini Flash (Backup)": {
+        "main": [
+          [
+            {
+              "node": "Parse Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Response": {
+        "main": [
+          [
+            {
+              "node": "Clean and Prepare QA",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Clean and Prepare QA": {
+        "main": [
+          [
+            {
+              "node": "Archivarius (QA)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Creative Node (Qwen)": {
+        "main": [
+          [
+            {
+              "node": "Parse Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Archivarius (QA)": {
+        "main": [
+          [
+            {
+              "node": "Script Approved?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Script Approved?": {
+        "main": [
+          [
+            {
+              "node": "Save Storyboard JSON",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Format Rejection",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save Storyboard JSON": {
+        "main": [
+          [
+            {
+              "node": "Trigger Video Assembly",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Rejection": {
+        "main": [
+          [
+            {
+              "node": "Increment Retry Counter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Increment Retry Counter": {
+        "main": [
+          [
+            {
+              "node": "Retry Limit Reached?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Retry Limit Reached?": {
+        "main": [
+          [
+            {
+              "node": "Dashboard: Critical Error",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Prepare Creative Prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trigger Video Assembly": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dashboard: Critical Error": {
+        "main": [
+          [
+            {
+              "node": "Generate JULES_CONSULT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate JULES_CONSULT": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "availableInMCP": true
+    },
+    "staticData": null,
+    "meta": {
+      "aiBuilderAssisted": true,
+      "builderVariant": "mcp"
+    },
+    "pinData": null,
+    "versionId": "dfaf483a-8689-43b3-8931-ad18af1ef34f",
+    "activeVersionId": null,
+    "versionCounter": 15,
+    "triggerCount": 0,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-05-12T09:28:13.140Z",
+        "createdAt": "2026-05-12T09:28:13.140Z",
+        "role": "workflow:owner",
+        "workflowId": "ZBWr6WCp0vRzrTpZ",
+        "projectId": "wlDTEhCvjchgUXra",
+        "project": {
+          "updatedAt": "2026-05-12T08:20:10.781Z",
+          "createdAt": "2026-05-12T08:11:44.552Z",
+          "id": "wlDTEhCvjchgUXra",
+          "name": "Sergei Lavrukhin <lavik105684@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "9664abf5-3b16-4a54-af10-667b06c8366b"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  },
+  {
+    "updatedAt": "2026-05-12T10:26:43.407Z",
+    "createdAt": "2026-05-12T10:26:41.827Z",
+    "id": "LYTjW458N9UY2Vnp",
+    "name": "06_Voiceover_Generator",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "path": "/home/node/.n8n-files/Scripts",
+          "options": {
+            "append": false,
+            "ignoreHidden": true
+          }
+        },
+        "id": "1",
+        "name": "Trigger: Approved Script",
+        "type": "n8n-nodes-base.localFileTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8002/voiceover",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"json_path\": \"{{ $json.path }}\" }",
+          "options": {}
+        },
+        "id": "2",
+        "name": "Generate Voiceover",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          250,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "amount": 5,
+          "unit": "seconds"
+        },
+        "id": "3",
+        "name": "Wait for Audio",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1,
+        "position": [
+          500,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8002/render",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"json_path\": \"{{ $node[\"Trigger: Approved Script\"].json[\"path\"] }}\" }",
+          "options": {}
+        },
+        "id": "4",
+        "name": "Trigger Video Render",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          750,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "command": "bash /data/sync_swarm.sh"
+        },
+        "id": "5",
+        "name": "Sync Swarm",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1000,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "Trigger: Approved Script": {
+        "main": [
+          [
+            {
+              "node": "Generate Voiceover",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Voiceover": {
+        "main": [
+          [
+            {
+              "node": "Wait for Audio",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait for Audio": {
+        "main": [
+          [
+            {
+              "node": "Trigger Video Render",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trigger Video Render": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "b704261b-e0fb-4d90-b668-29bdcbf2bb24",
+    "activeVersionId": null,
+    "versionCounter": 4,
+    "triggerCount": 0,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-05-12T10:26:41.833Z",
+        "createdAt": "2026-05-12T10:26:41.833Z",
+        "role": "workflow:owner",
+        "workflowId": "LYTjW458N9UY2Vnp",
+        "projectId": "wlDTEhCvjchgUXra",
+        "project": {
+          "updatedAt": "2026-05-12T08:20:10.781Z",
+          "createdAt": "2026-05-12T08:11:44.552Z",
+          "id": "wlDTEhCvjchgUXra",
+          "name": "Sergei Lavrukhin <lavik105684@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "9664abf5-3b16-4a54-af10-667b06c8366b"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  },
+  {
+    "updatedAt": "2026-05-12T10:34:44.188Z",
+    "createdAt": "2026-05-12T10:34:44.188Z",
+    "id": "I1GZvDOhd2v9ERe3",
+    "name": "04_Memoirs_Full_Production_Headless",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 20
+              }
+            ]
+          }
+        },
+        "id": "1",
+        "name": "Schedule",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "list",
+          "path": "/home/node/.n8n-files/Memoirs",
+          "options": {
+            "ignoreHidden": true
+          }
+        },
+        "id": "2",
+        "name": "List Memoirs",
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          200,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "read",
+          "fileSelector": "/home/node/.n8n-files/Prompts/creative_v1.txt"
+        },
+        "id": "3",
+        "name": "Read Creative Prompt",
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          400,
+          -100
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "read",
+          "fileSelector": "/home/node/.n8n-files/Prompts/archivist_v1.txt"
+        },
+        "id": "4",
+        "name": "Read Archivist Prompt",
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          400,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "read",
+          "fileSelector": "={{ $node[\"List Memoirs\"].json.path }}"
+        },
+        "id": "5",
+        "name": "Read Memoir",
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          600,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:11434/api/generate",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "model",
+                "value": "qwen2.5-coder:14b"
+              },
+              {
+                "name": "prompt",
+                "value": "={{ $node[\"Read Creative Prompt\"].json.data + \"\\n\\n\" + $node[\"Read Memoir\"].json.data }}"
+              },
+              {
+                "name": "stream",
+                "value": false
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "6",
+        "name": "Creative Node (Qwen)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          800,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:11434/api/generate",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "model",
+                "value": "qwen2.5:7b"
+              },
+              {
+                "name": "prompt",
+                "value": "={{ $node[\"Read Archivist Prompt\"].json.data + \"\\n\\n\" + $node[\"Creative Node (Qwen)\"].json.response }}"
+              },
+              {
+                "name": "stream",
+                "value": false
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "7",
+        "name": "Archivarius (QA)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1000,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{ $json.response }}",
+                "operation": "contains",
+                "value2": "PASS"
+              }
+            ]
+          }
+        },
+        "id": "8",
+        "name": "Is Approved?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          1200,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8002/render",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "json_content",
+                "value": "={{ $node[\"Creative Node (Qwen)\"].json.response }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "9",
+        "name": "Trigger Render",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1400,
+          -100
+        ]
+      },
+      {
+        "parameters": {
+          "url": "http://host.docker.internal:8501/success",
+          "options": {}
+        },
+        "id": "10",
+        "name": "Record Success",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1600,
+          -100
+        ]
+      },
+      {
+        "parameters": {
+          "command": "bash /data/sync_swarm.sh"
+        },
+        "id": "11",
+        "name": "Sync Swarm",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1800,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "command": "={{ 'echo \"# JULES CONSULT REPORT\\n\\n## Original Text\\n' + $node[\"Read Memoir\"].json.data + '\\n\\n## Failed JSON\\n' + $node[\"Creative Node (Qwen)\"].json.response + '\\n\\n## Archivist Criticism\\n' + $node[\"Archivarius (QA)\"].json.response + '\" > /data/JULES_CONSULT.md' }}"
+        },
+        "id": "12",
+        "name": "Generate JULES_CONSULT",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1400,
+          100
+        ]
+      }
+    ],
+    "connections": {
+      "Schedule": {
+        "main": [
+          [
+            {
+              "node": "List Memoirs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "List Memoirs": {
+        "main": [
+          [
+            {
+              "node": "Read Creative Prompt",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Read Archivist Prompt",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Read Memoir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Memoir": {
+        "main": [
+          [
+            {
+              "node": "Creative Node (Qwen)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Creative Node (Qwen)": {
+        "main": [
+          [
+            {
+              "node": "Archivarius (QA)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Archivarius (QA)": {
+        "main": [
+          [
+            {
+              "node": "Is Approved?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Approved?": {
+        "main": [
+          [
+            {
+              "node": "Trigger Render",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Generate JULES_CONSULT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trigger Render": {
+        "main": [
+          [
+            {
+              "node": "Record Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Record Success": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate JULES_CONSULT": {
+        "main": [
+          [
+            {
+              "node": "Sync Swarm",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "2a0d7891-a284-4b12-8a40-fabb888a82a0",
+    "activeVersionId": null,
+    "versionCounter": 4,
+    "triggerCount": 0,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-05-12T10:34:44.192Z",
+        "createdAt": "2026-05-12T10:34:44.192Z",
+        "role": "workflow:owner",
+        "workflowId": "I1GZvDOhd2v9ERe3",
+        "projectId": "wlDTEhCvjchgUXra",
+        "project": {
+          "updatedAt": "2026-05-12T08:20:10.781Z",
+          "createdAt": "2026-05-12T08:11:44.552Z",
+          "id": "wlDTEhCvjchgUXra",
+          "name": "Sergei Lavrukhin <lavik105684@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "9664abf5-3b16-4a54-af10-667b06c8366b"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]
