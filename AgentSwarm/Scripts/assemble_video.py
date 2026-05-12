@@ -39,18 +39,40 @@ def assemble_video(json_path):
                 scenes = list(data.values())
         
         clips = []
+        base_name = os.path.splitext(os.path.basename(json_path))[0]
+        audio_dir = os.path.join(r"C:\AI_DEV\AgentSwarm\Audio", base_name)
+        
+        # Ping Dashboard
+        try:
+            requests.get(f"http://localhost:8501/?agent=Video-maker&status=Audio:_Synced&message=Assembling_{base_name}")
+        except: pass
+
         for i, scene in enumerate(scenes):
-            text = scene.get('text', f"Scene {i+1}")
-            # Create a simple placeholder scene with MoviePy
-            # Using ColorClip as background
-            bg_clip = ColorClip(size=(1920, 1080), color=(int(255 * (i % 2)), 50, 100), duration=3)
+            text = scene.get('narration_text', scene.get('text', f"Scene {i+1}"))
             
-            # Subtitle
-            txt_clip = TextClip(text=text, font_size=70, color='white', size=(1800, 200), method='caption')
-            txt_clip = txt_clip.with_position('bottom').with_duration(3)
+            # Default duration 3s
+            duration = 3.0
+            audio = None
+            
+            # Look for audio
+            audio_path = os.path.join(audio_dir, f"scene_{i+1}.wav")
+            if os.path.exists(audio_path):
+                from moviepy import AudioFileClip
+                audio = AudioFileClip(audio_path)
+                duration = audio.duration + 0.5 # Add a small buffer
+            
+            # Create a simple placeholder scene
+            bg_clip = ColorClip(size=(1920, 1080), color=(int(255 * (i % 2)), 50, 100), duration=duration)
+            
+            # Subtitle (using narration text)
+            txt_clip = TextClip(text=text, font_size=50, color='white', size=(1800, 400), method='caption')
+            txt_clip = txt_clip.with_position('bottom').with_duration(duration)
             
             # Combine
             comp = CompositeVideoClip([bg_clip, txt_clip])
+            if audio:
+                comp = comp.with_audio(audio)
+                
             clips.append(comp)
             
         if not clips:

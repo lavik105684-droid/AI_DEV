@@ -49,12 +49,44 @@ async def update_status(
         return {"status": "success", "agent": agent, "new_status": status}
     return {"status": "error", "message": "Agent not found"}
 
+@app.get("/log_qa")
+async def log_qa(result: str = Query(...)):
+    state = load_state()
+    stats = state.get("qa_stats", {"pass": 0, "fail": 0})
+    if result.upper() == "PASS":
+        stats["pass"] += 1
+    else:
+        stats["fail"] += 1
+    state["qa_stats"] = stats
+    save_state(state)
+    return {"status": "success", "stats": stats}
+
 @app.get("/increment_cloud")
 async def increment_cloud():
     state = load_state()
     state["cloud_calls"] = state.get("cloud_calls", 0) + 1
     save_state(state)
     return {"status": "success", "total_cloud_calls": state["cloud_calls"]}
+
+@app.get("/generate_report")
+async def generate_report():
+    state = load_state()
+    stats = state.get("qa_stats", {"pass": 0, "fail": 0})
+    total = stats["pass"] + stats["fail"]
+    efficiency = 0.0
+    if total > 0:
+        efficiency = (stats["pass"] / total) * 100
+    
+    saved = (stats["pass"] * 3) - state.get("cloud_calls", 0)
+    
+    report = {
+        "efficiency": f"{efficiency:.1f}%",
+        "saved_calls": saved,
+        "last_report": datetime.now().isoformat()
+    }
+    state["system_report"] = report
+    save_state(state)
+    return report
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8501)

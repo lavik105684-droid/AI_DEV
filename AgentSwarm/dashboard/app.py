@@ -24,12 +24,18 @@ def load_state():
 
 state = load_state()
 
-col_m1, col_m2, col_m3 = st.columns([1, 1, 1])
+col_m1, col_m2, col_m3, col_m4 = st.columns([1, 1, 1, 1])
+
+report = state.get("system_report", {"efficiency": "0%", "saved_calls": 0})
 
 with col_m1:
     st.metric("Total Agents", "8")
 with col_m2:
-    st.metric("Cloud Calls Today", state.get("cloud_calls", 0))
+    st.metric("Cloud Calls", state.get("cloud_calls", 0))
+with col_m3:
+    st.metric("Efficiency", report["efficiency"])
+with col_m4:
+    st.metric("Saved Cloud Calls", report["saved_calls"])
 
 st.divider()
 
