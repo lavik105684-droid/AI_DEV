@@ -24,9 +24,18 @@ def load_state():
 
 state = load_state()
 
-col1, col2 = st.columns([1, 2])
+col_m1, col_m2, col_m3 = st.columns([1, 1, 1])
 
-with col1:
+with col_m1:
+    st.metric("Total Agents", "8")
+with col_m2:
+    st.metric("Cloud Calls Today", state.get("cloud_calls", 0))
+
+st.divider()
+
+col_main1, col_main2 = st.columns([1, 2])
+
+with col_main1:
     st.header("Статус Агентов")
     
     def get_status_color(status):
@@ -42,7 +51,7 @@ with col1:
         st.markdown(f"**{agent}**: <span style='color:{color}'>{status}</span>", unsafe_allow_html=True)
         st.progress(100 if color == "green" else (50 if color == "blue" else (100 if color == "red" else 0)))
 
-with col2:
+with col_main2:
     st.header("Логи действий")
     log_text = "\n".join(state.get("logs", []))
     st.text_area("Activity Log", value=log_text, height=500, disabled=True)

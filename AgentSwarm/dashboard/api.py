@@ -49,5 +49,12 @@ async def update_status(
         return {"status": "success", "agent": agent, "new_status": status}
     return {"status": "error", "message": "Agent not found"}
 
+@app.get("/increment_cloud")
+async def increment_cloud():
+    state = load_state()
+    state["cloud_calls"] = state.get("cloud_calls", 0) + 1
+    save_state(state)
+    return {"status": "success", "total_cloud_calls": state["cloud_calls"]}
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8501)
